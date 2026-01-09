@@ -102,6 +102,41 @@
       background: #333333;
     }
 
+    .lfg-button {
+      display: inline-block;
+      padding: 20px 48px;
+      border-radius: 999px;
+      background: #2563eb;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 32px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+
+    .lfg-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+      background: #1d4ed8;
+    }
+
+    .lfg-button:active {
+      transform: translateY(0);
+    }
+
+    .firework {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
     @media (max-width: 640px) {
       .card {
         padding: 48px 32px;
@@ -118,6 +153,11 @@
       .logo {
         width: 100px;
         height: 100px;
+      }
+
+      .lfg-button {
+        font-size: 24px;
+        padding: 16px 36px;
       }
     }
   </style>
@@ -138,8 +178,86 @@
     Make your data shine!
     </p>
     
-      LFG!
+    <button class="lfg-button" id="lfgButton">LFG!</button>
     
   </div>
+
+  <script>
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#8800ff'];
+    
+    function createFirework(x, y) {
+      const particleCount = 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firework';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        document.body.appendChild(particle);
+        
+        const angle = (Math.PI * 2 * i) / particleCount;
+        const velocity = 2 + Math.random() * 3;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
+        
+        let px = x;
+        let py = y;
+        let opacity = 1;
+        let size = 4 + Math.random() * 4;
+        
+        const animate = () => {
+          px += vx;
+          py += vy + 0.5; // gravity
+          opacity -= 0.02;
+          size *= 0.98;
+          
+          particle.style.left = px + 'px';
+          particle.style.top = py + 'px';
+          particle.style.opacity = opacity;
+          particle.style.width = size + 'px';
+          particle.style.height = size + 'px';
+          
+          if (opacity > 0 && size > 0.5) {
+            requestAnimationFrame(animate);
+          } else {
+            particle.remove();
+          }
+        };
+        
+        requestAnimationFrame(animate);
+      }
+    }
+    
+    function createExplosion() {
+      // Create multiple explosions across the page
+      const explosions = 8;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      for (let i = 0; i < explosions; i++) {
+        setTimeout(() => {
+          const x = Math.random() * width;
+          const y = Math.random() * height;
+          createFirework(x, y);
+        }, i * 100);
+      }
+    }
+    
+    document.getElementById('lfgButton').addEventListener('click', function(e) {
+      const rect = this.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      
+      // Create explosion at button location
+      createFirework(x, y);
+      
+      // Create explosions across the page
+      setTimeout(() => {
+        createExplosion();
+      }, 200);
+    });
+  </script>
 </body>
 </html>
